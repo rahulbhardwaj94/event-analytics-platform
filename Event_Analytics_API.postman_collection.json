@@ -1,0 +1,521 @@
+{
+  "info": {
+    "name": "Event Analytics Platform API",
+    "description": "Complete API collection for the Event Analytics Platform with all endpoints for event ingestion, analytics, and management.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "sample-api-key-789",
+      "type": "string"
+    },
+    {
+      "key": "orgId",
+      "value": "sample-org-123",
+      "type": "string"
+    },
+    {
+      "key": "projectId",
+      "value": "sample-project-456",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "X-API-Key",
+        "value": "{{apiKey}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/../health",
+          "host": ["{{baseUrl}}"],
+          "path": ["..", "health"]
+        }
+      }
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Ingest Single Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user123\",\n  \"eventName\": \"page_view\",\n  \"timestamp\": \"2024-01-01T10:00:00Z\",\n  \"properties\": {\n    \"pageUrl\": \"/home\",\n    \"referrer\": \"google.com\",\n    \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64)\"\n  },\n  \"sessionId\": \"session-123\",\n  \"pageUrl\": \"/home\",\n  \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64)\",\n  \"ipAddress\": \"192.168.1.1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            }
+          }
+        },
+        {
+          "name": "Ingest Batch Events",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"userId\": \"user123\",\n    \"eventName\": \"page_view\",\n    \"timestamp\": \"2024-01-01T10:00:00Z\",\n    \"properties\": {\n      \"pageUrl\": \"/home\"\n    }\n  },\n  {\n    \"userId\": \"user123\",\n    \"eventName\": \"button_click\",\n    \"timestamp\": \"2024-01-01T10:01:00Z\",\n    \"properties\": {\n      \"buttonId\": \"signup-btn\",\n      \"pageUrl\": \"/home\"\n    }\n  },\n  {\n    \"userId\": \"user123\",\n    \"eventName\": \"form_submit\",\n    \"timestamp\": \"2024-01-01T10:02:00Z\",\n    \"properties\": {\n      \"formType\": \"signup\",\n      \"pageUrl\": \"/signup\"\n    }\n  }\n]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            }
+          }
+        },
+        {
+          "name": "Get Event Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/events/summary?startDate=2024-01-01T00:00:00Z&endDate=2024-01-31T23:59:59Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["events", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31T23:59:59Z"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Real-time Count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/events/realtime",
+              "host": ["{{baseUrl}}"],
+              "path": ["events", "realtime"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Funnels",
+      "item": [
+        {
+          "name": "Create Funnel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"E-commerce Conversion Funnel\",\n  \"steps\": [\n    {\n      \"eventName\": \"page_view\",\n      \"filters\": {\n        \"pageUrl\": {\n          \"$regex\": \"/products\"\n        }\n      }\n    },\n    {\n      \"eventName\": \"add_to_cart\"\n    },\n    {\n      \"eventName\": \"checkout_start\"\n    },\n    {\n      \"eventName\": \"payment_complete\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/funnels",
+              "host": ["{{baseUrl}}"],
+              "path": ["funnels"]
+            }
+          }
+        },
+        {
+          "name": "Get All Funnels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/funnels",
+              "host": ["{{baseUrl}}"],
+              "path": ["funnels"]
+            }
+          }
+        },
+        {
+          "name": "Get Funnel by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/funnels/{{funnelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["funnels", "{{funnelId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Funnel Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/funnels/{{funnelId}}/analytics?startDate=2024-01-01T00:00:00Z&endDate=2024-01-31T23:59:59Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["funnels", "{{funnelId}}", "analytics"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31T23:59:59Z"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Funnel",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated E-commerce Funnel\",\n  \"steps\": [\n    {\n      \"eventName\": \"page_view\"\n    },\n    {\n      \"eventName\": \"add_to_cart\"\n    },\n    {\n      \"eventName\": \"purchase\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/funnels/{{funnelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["funnels", "{{funnelId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Funnel",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/funnels/{{funnelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["funnels", "{{funnelId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Retention",
+      "item": [
+        {
+          "name": "Get Retention Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/retention?cohort=signup&days=7&startDate=2024-01-01T00:00:00Z&endDate=2024-01-31T23:59:59Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["retention"],
+              "query": [
+                {
+                  "key": "cohort",
+                  "value": "signup"
+                },
+                {
+                  "key": "days",
+                  "value": "7"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31T23:59:59Z"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Available Cohorts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/retention/cohorts",
+              "host": ["{{baseUrl}}"],
+              "path": ["retention", "cohorts"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Metrics",
+      "item": [
+        {
+          "name": "Get Event Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/metrics?event=page_view&interval=daily&startDate=2024-01-01T00:00:00Z&endDate=2024-01-31T23:59:59Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["metrics"],
+              "query": [
+                {
+                  "key": "event",
+                  "value": "page_view"
+                },
+                {
+                  "key": "interval",
+                  "value": "daily"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31T23:59:59Z"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Available Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/metrics/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["metrics", "events"]
+            }
+          }
+        },
+        {
+          "name": "Get Metrics Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/metrics/summary?startDate=2024-01-01T00:00:00Z&endDate=2024-01-31T23:59:59Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["metrics", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31T23:59:59Z"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get User Journey",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/user-001/journey?startDate=2024-01-01T00:00:00Z&endDate=2024-01-31T23:59:59Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "user-001", "journey"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31T23:59:59Z"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/user-001/events?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "user-001", "events"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/user-001/summary?startDate=2024-01-01T00:00:00Z&endDate=2024-01-31T23:59:59Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "user-001", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31T23:59:59Z"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Create API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test API Key\",\n  \"projectId\": \"{{projectId}}\",\n  \"permissions\": [\"read\", \"write\", \"analytics\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/keys",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "keys"]
+            }
+          }
+        },
+        {
+          "name": "Get API Keys",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/keys",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "keys"]
+            }
+          }
+        },
+        {
+          "name": "Get API Key by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/keys/{{apiKeyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "keys", "{{apiKeyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update API Key",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated API Key\",\n  \"permissions\": [\"read\", \"write\", \"admin\"],\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/keys/{{apiKeyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "keys", "{{apiKeyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete API Key",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/keys/{{apiKeyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "keys", "{{apiKeyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Validate API Key",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "validate"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+} 
