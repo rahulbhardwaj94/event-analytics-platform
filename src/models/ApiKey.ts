@@ -1,10 +1,23 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import { IApiKey } from '../types';
 import crypto from 'crypto';
 
-export interface IApiKeyDocument extends IApiKey, Document {
+export interface IApiKeyDocument extends Omit<IApiKey, 'id'>, Document {
   generateKey(): string;
   validateKey(key: string): boolean;
+  updateLastUsed(): Promise<IApiKeyDocument>;
+  hasPermission(permission: string): boolean;
+}
+
+export interface IApiKeyModel extends Model<IApiKeyDocument> {
+  findByKey(key: string): Promise<IApiKeyDocument | null>;
+  findByOrgAndProject(orgId: string, projectId?: string): Promise<IApiKeyDocument[]>;
+  createApiKey(data: {
+    name: string;
+    orgId: string;
+    projectId?: string;
+    permissions?: string[];
+  }): Promise<IApiKeyDocument>;
 }
 
 const ApiKeySchema = new Schema<IApiKeyDocument>({
@@ -103,4 +116,4 @@ ApiKeySchema.methods.hasPermission = function(permission: string): boolean {
   return this.permissions.includes(permission) || this.permissions.includes('admin');
 };
 
-export const ApiKey = mongoose.model<IApiKeyDocument>('ApiKey', ApiKeySchema); 
+export const ApiKey = mongoose.model<IApiKeyDocument, IApiKeyModel>('ApiKey', ApiKeySchema); 

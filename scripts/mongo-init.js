@@ -25,14 +25,14 @@ db.funnels.createIndex({ "orgId": 1, "projectId": 1 });
 db.funnels.createIndex({ "orgId": 1, "projectId": 1, "name": 1 });
 
 // API Keys collection
-db.createCollection('apikeys');
-db.apikeys.createIndex({ "apiKey": 1 }, { unique: true });
-db.apikeys.createIndex({ "orgId": 1, "projectId": 1 });
+db.createCollection('api_keys');
+db.api_keys.createIndex({ "key": 1 }, { unique: true });
+db.api_keys.createIndex({ "orgId": 1, "projectId": 1 });
 
 // Create a default API key for testing
 print('Creating default API key...');
-db.apikeys.insertOne({
-  apiKey: "sample-api-key-789",
+db.api_keys.insertOne({
+  key: "sample-api-key-789",
   orgId: "sample-org-123",
   projectId: "sample-project-456",
   name: "Default API Key",

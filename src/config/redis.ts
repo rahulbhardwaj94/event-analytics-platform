@@ -12,7 +12,6 @@ export const setupRedis = async (): Promise<void> => {
       password: process.env.REDIS_PASSWORD || undefined,
       socket: {
         connectTimeout: 10000,
-        lazyConnect: true,
       },
     });
 

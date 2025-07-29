@@ -1,7 +1,14 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import { IFunnel } from '../types';
 
-export interface IFunnelDocument extends IFunnel, Document {}
+export interface IFunnelDocument extends Omit<IFunnel, 'id'>, Document {
+  toAnalyticsFormat(): any;
+}
+
+export interface IFunnelModel extends Model<IFunnelDocument> {
+  findByOrgAndProject(orgId: string, projectId: string): Promise<IFunnelDocument[]>;
+  findByName(name: string, orgId: string, projectId: string): Promise<IFunnelDocument | null>;
+}
 
 const FunnelStepSchema = new Schema({
   eventName: {
@@ -86,4 +93,4 @@ FunnelSchema.methods.toAnalyticsFormat = function() {
   };
 };
 
-export const Funnel = mongoose.model<IFunnelDocument>('Funnel', FunnelSchema); 
+export const Funnel = mongoose.model<IFunnelDocument, IFunnelModel>('Funnel', FunnelSchema); 

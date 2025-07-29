@@ -1,7 +1,6 @@
-import { connectDatabase, disconnectDatabase } from '../config/database';
-import { setupRedis } from '../config/redis';
-import { Event, Funnel, ApiKey } from '../models';
+import { connectDatabase } from '../config/database';
 import { logger } from '../utils/logger';
+import { ApiKey } from '../models/ApiKey';
 
 async function setupDatabase() {
   try {
@@ -10,59 +9,50 @@ async function setupDatabase() {
     // Connect to database
     await connectDatabase();
     
-    // Create indexes for Event collection
-    logger.info('Creating Event indexes...');
-    await Event.createIndexes();
+    // Check if default API key exists
+    const existingKey = await ApiKey.findByKey('sample-api-key-789');
     
-    // Create indexes for Funnel collection
-    logger.info('Creating Funnel indexes...');
-    await Funnel.createIndexes();
-    
-    // Create indexes for ApiKey collection
-    logger.info('Creating ApiKey indexes...');
-    await ApiKey.createIndexes();
+    if (!existingKey) {
+      logger.info('Creating default API key...');
+      
+      // Create default API key
+      const defaultApiKey = new ApiKey({
+        key: 'sample-api-key-789',
+        orgId: 'sample-org-123',
+        projectId: 'sample-project-456',
+        name: 'Default API Key',
+        permissions: ['read', 'write'],
+        rateLimit: {
+          windowMs: 900000, // 15 minutes
+          maxRequests: 1000
+        },
+        isActive: true
+      });
+      
+      await defaultApiKey.save();
+      logger.info('Default API key created successfully');
+    } else {
+      logger.info('Default API key already exists');
+    }
     
     logger.info('Database setup completed successfully');
-    
   } catch (error) {
-    logger.error('Error setting up database:', error);
+    logger.error('Database setup failed:', error);
     throw error;
-  } finally {
-    await disconnectDatabase();
-  }
-}
-
-async function setupRedisConnection() {
-  try {
-    logger.info('Setting up Redis...');
-    await setupRedis();
-    logger.info('Redis setup completed successfully');
-  } catch (error) {
-    logger.error('Error setting up Redis:', error);
-    throw error;
-  }
-}
-
-async function main() {
-  try {
-    logger.info('Starting Event Analytics Platform setup...');
-    
-    // Setup database
-    await setupDatabase();
-    
-    // Setup Redis
-    await setupRedisConnection();
-    
-    logger.info('🎉 Event Analytics Platform setup completed successfully!');
-    logger.info('You can now start the server with: npm run dev');
-    
-  } catch (error) {
-    logger.error('❌ Setup failed:', error);
-    process.exit(1);
   }
 }
 
 // Run setup if this file is executed directly
 if (require.main === module) {
-  main();
-} 
+  setupDatabase()
+    .then(() => {
+      logger.info('Setup completed successfully');
+      process.exit(0);
+    })
+    .catch((error) => {
+      logger.error('Setup failed:', error);
+      process.exit(1);
+    });
+}
+
+export { setupDatabase }; 

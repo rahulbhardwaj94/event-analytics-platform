@@ -1,7 +1,41 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import { IEvent } from '../types';
 
-export interface IEventDocument extends IEvent, Document {}
+export interface IEventDocument extends Omit<IEvent, 'id'>, Document {
+  toAnalyticsFormat(): any;
+}
+
+export interface IEventModel extends Model<IEventDocument> {
+  findByDateRange(
+    orgId: string,
+    projectId: string,
+    startDate: Date,
+    endDate: Date,
+    filters?: any
+  ): Promise<IEventDocument[]>;
+  getEventCounts(
+    orgId: string,
+    projectId: string,
+    startDate: Date,
+    endDate: Date,
+    eventNames?: string[]
+  ): Promise<any[]>;
+  getUserJourney(
+    userId: string,
+    orgId: string,
+    projectId: string,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<IEventDocument[]>;
+  getFunnelData(
+    orgId: string,
+    projectId: string,
+    steps: string[],
+    startDate: Date,
+    endDate: Date,
+    filters?: any
+  ): Promise<any[]>;
+}
 
 const EventSchema = new Schema<IEventDocument>({
   userId: {
@@ -227,4 +261,4 @@ EventSchema.methods.toAnalyticsFormat = function() {
   };
 };
 
-export const Event = mongoose.model<IEventDocument>('Event', EventSchema); 
+export const Event = mongoose.model<IEventDocument, IEventModel>('Event', EventSchema); 
